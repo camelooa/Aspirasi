@@ -43,10 +43,13 @@ class LoginController extends Controller
             $user = Auth::user();
 
             // role redirect
-            return match ($user->roles) {
-                'admin', 'super_admin' => redirect()->route('admin.dashboard'),
-                default => redirect()->route('dashboard'),
-            };
+            if (in_array($user->roles, ['admin', 'super_admin'])) {
+                return redirect()->route('admin.dashboard');
+            }
+            if ($user->roles === 'siswa') {
+                return redirect()->route('siswa.dashboard');
+            }
+            return redirect()->route('login');
         }
 
         return back()->withErrors([

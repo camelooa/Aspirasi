@@ -24,16 +24,15 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    // tell Laravel login uses username
-    public function getAuthIdentifierName()
-    {
-        return 'username';
-    }
-
     protected function casts(): array
     {
         return [
             'password' => 'hashed',
         ];
+    }
+
+    public function aspirasis()
+    {
+        return $this->hasMany(\App\Models\aspirasi::class, 'user_id');
     }
 }
