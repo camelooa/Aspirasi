@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class aspirasi extends Model
 {
-    protected $fillable = ['user_id', 'category_id', 'feedback_title', 'details', 'location', 'status', 'image', 'admin_response'];
+    protected $fillable = ['user_id', 'category_id', 'feedback_title', 'details', 'location', 'status', 'image', 'admin_response', 'admin_id'];
 
     public function user()
     {
@@ -18,8 +18,9 @@ class aspirasi extends Model
         return $this->belongsTo(\App\Models\Kategori::class, 'category_id');
     }
 
-    public function komentars()
+    public function admin()
     {
-        return $this->hasMany(\App\Models\komentar::class);
+        return $this->belongsTo(\App\Models\User::class, 'admin_id');
     }
+
 }

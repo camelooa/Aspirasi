@@ -19,10 +19,10 @@
                 <!-- User Info -->
                 <div class="flex items-center gap-4 mb-6">
                     <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-lg">
-                        {{ substr($feedback->user->name ?? 'U', 0, 2) }}
+                        {{ substr($feedback->user->full_name ?? $feedback->user->username ?? 'U', 0, 2) }}
                     </div>
                     <div>
-                        <h3 class="font-bold text-lg text-gray-900">{{ $feedback->user->name ?? 'Anonymous' }}</h3>
+                        <h3 class="font-bold text-lg text-gray-900">{{ $feedback->user->full_name ?? $feedback->user->username ?? 'Anonymous' }}</h3>
                         <p class="text-sm text-gray-500">{{ $feedback->created_at->format('d F Y, H:i') }}</p>
                     </div>
                     <span class="ml-auto px-3 py-1 rounded-full text-xs font-medium {{ $feedback->status === 'complete' ? 'bg-green-100 text-green-800' : ($feedback->status === 'on_progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800') }}">
@@ -34,7 +34,7 @@
                 <div class="mb-6">
                     <h4 class="text-xl font-bold text-gray-900 mb-2">{{ $feedback->feedback_title }}</h4>
                     <div class="inline-block px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600 mb-4">
-                        {{ $feedback->kategori->category_name ?? 'Uncategorized' }}
+                        {{ $feedback->kategori->name ?? 'Uncategorized' }}
                     </div>
                     <p class="text-gray-700 leading-relaxed whitespace-pre-line">{{ $feedback->details }}</p>
                 </div>
@@ -47,28 +47,25 @@
                 @endif
             </div>
 
-            <!-- Comments Section -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="font-bold text-gray-900 mb-4">Komentar ({{ $feedback->komentars->count() }})</h3>
-                <div class="space-y-4">
-                    @forelse($feedback->komentars as $komentar)
-                    <div class="flex gap-3">
-                        <div class="w-8 h-8 rounded-full bg-gray-100 flex-shrink-0 flex items-center justify-center text-xs font-bold text-gray-600">
-                            {{ substr($komentar->user->name ?? 'U', 0, 2) }}
-                        </div>
-                        <div class="flex-1 bg-gray-50 rounded-lg p-3">
-                            <div class="flex justify-between items-start mb-1">
-                                <span class="font-bold text-sm text-gray-900">{{ $komentar->user->name ?? 'User' }}</span>
-                                <span class="text-xs text-gray-500">{{ $komentar->created_at->diffForHumans() }}</span>
-                            </div>
-                            <p class="text-sm text-gray-700">{{ $komentar->komentar }}</p>
-                        </div>
+            <!-- Admin Response Section (Main Content) -->
+            @if(!empty($feedback->admin_response))
+            <div class="bg-indigo-50 border-l-4 border-indigo-500 rounded-lg shadow-sm p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+                        </svg>
                     </div>
-                    @empty
-                    <p class="text-gray-500 text-sm">Belum ada komentar.</p>
-                    @endforelse
+                    <div>
+                        <h3 class="font-bold text-gray-900">Tanggapan Resmi Admin</h3>
+                        <p class="text-xs text-gray-500">Dibalas pada {{ $feedback->updated_at->format('d F Y, H:i') }}</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg p-4 border border-indigo-100 italic text-gray-700 leading-relaxed whitespace-pre-line">
+                    "{{ $feedback->admin_response }}"
                 </div>
             </div>
+            @endif
         </div>
 
         <!-- Sidebar / Admin Response -->

@@ -5,59 +5,70 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OtpMail;
+use App\Models\User;
+use Carbon\Carbon;
 
 class LoginController extends Controller
 {
-    // show login page
+    /*
+    |--------------------------------------------------------------------------
+    | Show Login Page
+    |--------------------------------------------------------------------------
+    */
     public function index()
     {
-        // Clear any stale session data when viewing login page
-        if (Auth::check()) {
-            Auth::logout();
-            Session::flush();
-        }
+        // ❌ JANGAN flush / logout di sini
         return view('auth.login');
     }
 
-    // handle login
+
+    /*
+    |--------------------------------------------------------------------------
+    | Handle Login (Step 1: Validate Password + Send OTP)
+    |--------------------------------------------------------------------------
+    */
     public function login(Request $request)
     {
-        // Flush any previous session data
-        $request->session()->flush();
-        
-        $credentials = $request->validate([
-            'username' => ['required', 'string'],
-            'password' => ['required', 'string'],
+        $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
         ]);
 
-        // IMPORTANT: explicitly set field
-        if (Auth::attempt([
-            'username' => $credentials['username'],
-            'password' => $credentials['password'],
-        ])) {
-
-            // Regenerate session ID after successful login
-            $request->session()->regenerate();
-
-            $user = Auth::user();
-
-            // role redirect
-            if (in_array($user->roles, ['admin', 'super_admin'])) {
-                return redirect()->route('admin.dashboard');
-            }
-            if ($user->roles === 'siswa') {
-                return redirect()->route('siswa.dashboard');
-            }
-            return redirect()->route('login');
+        // cek credentials TANPA login
+        if (!Auth::validate($request->only('email', 'password'))) {
+            return back()->withErrors([
+                'email' => 'Email atau password salah'
+            ])->withInput();
         }
 
-        return back()->withErrors([
-            'username' => 'Username atau password salah',
-        ])->withInput();
+        // ambil user
+        $user = User::where('email', $request->email)->first();
+
+        // generate OTP
+        $otp = rand(100000, 999999);
+
+        $user->otp_code = $otp;
+        $user->otp_expires_at = Carbon::now()->addMinutes(5);
+        $user->save();
+
+        // kirim email
+        Mail::to($user->email)->send(new OtpMail($otp, $user->username));
+
+        // simpan sementara (BELUM LOGIN)
+        session(['otp_user_id' => $user->id]);
+
+        // redirect ke halaman otp
+        return redirect()->route('otp.form');
     }
 
-    // logout
+
+    /*
+    |--------------------------------------------------------------------------
+    | Logout
+    |--------------------------------------------------------------------------
+    */
     public function logout(Request $request)
     {
         Auth::logout();

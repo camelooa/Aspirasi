@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('komentars', function (Blueprint $table) {
+        Schema::create('penanggung_jawabs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('aspirasi_id')->constrained('aspirasis')->onDelete('cascade');
-            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->text('komentar');
+            $table->string('nama');
+            $table->string('email')->unique();
+            $table->string('jabatan')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('komentars');
+        Schema::dropIfExists('penanggung_jawabs');
     }
 };

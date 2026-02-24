@@ -9,30 +9,6 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $totalCompleted = \App\Models\aspirasi::where('status', 'complete')->count();
-        $totalInProgress = \App\Models\aspirasi::where('status', 'on_progress')->count();
-
-        $completedAspirations = \App\Models\aspirasi::where('status', 'complete')
-            ->latest()
-            ->take(3)
-            ->get();
-
-        $inProgressAspirations = \App\Models\aspirasi::where('status', 'on_progress')
-            ->latest()
-            ->take(3)
-            ->get();
-
-        return view('admin.dashboard', [
-            'user' => Auth::user(),
-            'totalCompleted' => $totalCompleted,
-            'totalInProgress' => $totalInProgress,
-            'completedAspirations' => $completedAspirations,
-            'inProgressAspirations' => $inProgressAspirations,
-        ]);
-    }
-
-    public function statistics()
-    {
         // 1. Basic Counts
         $totalFeedback = \App\Models\aspirasi::count();
         $totalCompleted = \App\Models\aspirasi::where('status', 'complete')->count();
@@ -54,7 +30,7 @@ class DashboardController extends Controller
         for ($i = 0; $i < 7; $i++) {
             $date = $startDate->copy()->addDays($i);
             $weeklyData[$date->format('Y-m-d')] = [
-                'day_name' => $date->translatedFormat('l'), // Senin, Selasa, etc. (needs locale set or manual mapping if English)
+                'day_name' => $date->translatedFormat('l'), // Senin, Selasa, etc.
                 'complete' => 0,
                 'on_progress' => 0
             ];
@@ -83,23 +59,37 @@ class DashboardController extends Controller
         $respondedCount = \App\Models\aspirasi::whereNotNull('admin_response')->where('admin_response', '!=', '')->count();
         $responseRate = $totalFeedback > 0 ? round(($respondedCount / $totalFeedback) * 100) : 0;
         
-        $reviewedRate = $totalFeedback > 0 ? round((($totalCompleted + $totalInProgress) / $totalFeedback) * 100) : 0; // Assuming all form of processed is reviewed
+        $reviewedRate = $totalFeedback > 0 ? round((($totalCompleted + $totalInProgress) / $totalFeedback) * 100) : 0; 
         $completedRate = $totalFeedback > 0 ? round(($totalCompleted / $totalFeedback) * 100) : 0;
 
-        return view('admin.statistics', [
+        // 6. Recent Lists
+        $completedAspirations = \App\Models\aspirasi::where('status', 'complete')
+            ->latest()
+            ->take(3)
+            ->get();
+
+        $inProgressAspirations = \App\Models\aspirasi::where('status', 'on_progress')
+            ->latest()
+            ->take(3)
+            ->get();
+
+        return view('admin.dashboard', [
             'user' => Auth::user(),
             'totalFeedback' => $totalFeedback,
             'totalCompleted' => $totalCompleted,
             'totalInProgress' => $totalInProgress,
-            'countsByCategory' => $countsByCategory,
             'totalUsers' => $totalUsers,
+            'countsByCategory' => $countsByCategory,
             'weeklyData' => $weeklyData,
             'activeToday' => $activeToday,
             'activeThisWeek' => $activeThisWeek,
             'activeThisMonth' => $activeThisMonth,
             'responseRate' => $responseRate,
             'reviewedRate' => $reviewedRate,
-            'completedRate' => $completedRate
+            'completedRate' => $completedRate,
+            'completedAspirations' => $completedAspirations,
+            'inProgressAspirations' => $inProgressAspirations,
         ]);
     }
 }
+

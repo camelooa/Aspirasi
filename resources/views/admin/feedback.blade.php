@@ -39,9 +39,11 @@
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium text-blue-700">
-                                {{ substr($feedback->user->name ?? 'User', 0, 2) }}
+                                {{ substr($feedback->user->full_name ?? $feedback->user->username ?? 'U', 0, 2) }}
                             </div>
-                            <span class="text-sm font-medium text-gray-900">{{ $feedback->user->name ?? 'Anonymous' }}</span>
+                            <a href="{{ route('admin.feedback.show', $feedback->id) }}" class="hover:text-blue-600 hover:underline">
+                                <span class="text-sm font-medium text-gray-900">{{ $feedback->user->full_name ?? $feedback->user->username ?? 'Anonymous' }}</span>
+                            </a>
                         </div>
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-600">

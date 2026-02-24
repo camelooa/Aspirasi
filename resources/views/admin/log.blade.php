@@ -49,13 +49,13 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium text-blue-700">
-                                    {{ substr($log->user->name ?? 'User', 0, 2) }}
+                                    {{ substr($log->user->full_name ?? $log->user->username ?? 'U', 0, 2) }}
                                 </div>
-                                <span class="text-sm font-medium text-gray-900">{{ $log->user->name ?? 'Anonymous' }}</span>
+                                <span class="text-sm font-medium text-gray-900">{{ $log->user->full_name ?? $log->user->username ?? 'Anonymous' }}</span>
                             </div>
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-600">{{ $log->feedback_title }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $log->kategori->category_name ?? 'Lainnya' }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $log->kategori->name ?? 'Lainnya' }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $log->status === 'complete' ? 'bg-green-100 text-green-800' : ($log->status === 'on_progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800') }}">
                                 {{ ucfirst(str_replace('_', ' ', $log->status)) }}

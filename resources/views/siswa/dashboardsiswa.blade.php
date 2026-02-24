@@ -1,161 +1,123 @@
 @extends('layout.siswa')
 
 @section('content')
-<div class="p-8 bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
-    <!-- Welcome Section -->
-    <div class="mb-8">
-        <h2 class="text-3xl font-bold text-gray-900 mb-2">Selamat Datang, {{ auth()->user()->full_name ?? auth()->user()->name }}!</h2>
-        <p class="text-gray-600">Platform untuk menyuarakan aspirasi dan ide-ide konstruktif Anda</p>
+<div class="p-4 md:p-8 space-y-8 bg-gray-100 min-h-screen">
+    <!-- Header/Greeting Area -->
+    <div class="relative overflow-hidden rounded-3xl bg-gray-900 p-8 md:p-12 text-white shadow-2xl">
+        <div class="absolute right-0 top-0 w-64 h-64 bg-blue-600 bg-opacity-20 filter blur-3xl -mr-20 -mt-20"></div>
+        <div class="absolute left-0 bottom-0 w-64 h-64 bg-indigo-600 bg-opacity-10 filter blur-3xl -ml-20 -mb-20"></div>
+        
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-center md:text-left">
+                <h2 class="text-3xl md:text-4xl font-black tracking-tight mb-2">
+                    Halo, <span class="text-blue-400">{{ auth()->user()->username }}</span> 👋
+                </h2>
+                <p class="text-gray-400 font-medium max-w-md">Sampaikan aspirasi Anda untuk memajukan sekolah kita bersama. Suara Anda sangat berharga.</p>
+            </div>
+            <div class="flex gap-3">
+                <a href="{{ route('siswa.buataspirasi') }}" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold transition-all transform active:scale-95 shadow-lg">
+                    Buat Aspirasi
+                </a>
+                <a href="{{ route('siswa.aspirasisaya') }}" class="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-2xl font-bold transition-all transform active:scale-95">
+                    Aspirasi Saya
+                </a>
+            </div>
+        </div>
     </div>
 
-    <!-- Quick Action Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <!-- Create Aspirasi Card -->
-        <a href="{{ route('siswa.buataspirasi') }}" class="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-            <div class="flex items-center gap-4">
-                <div class="w-14 h-14 rounded-lg bg-blue-100 flex items-center justify-center">
-                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold text-gray-900">Buat Aspirasi Baru</h3>
-                    <p class="text-sm text-gray-600">Sampaikan ide Anda sekarang</p>
-                </div>
-            </div>
-        </a>
 
-        <!-- My Aspirations Card -->
-        <a href="{{ route('siswa.aspirasisaya') }}" class="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-            <div class="flex items-center gap-4">
-                <div class="w-14 h-14 rounded-lg bg-green-100 flex items-center justify-center">
-                    <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold text-gray-900">Aspirasi Saya</h3>
-                    <p class="text-sm text-gray-600">Lihat semua aspirasi Anda</p>
-                </div>
-            </div>
-        </a>
-
-        <!-- Aspirasi Orang Lain Card -->
-        <a href="{{ route('siswa.aspirasioranglain') }}" class="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-            <div class="flex items-center gap-4">
-                <div class="w-14 h-14 rounded-lg bg-purple-100 flex items-center justify-center">
-                    <svg class="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-2m0 0l-4 2m4-2v2m5-6a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold text-gray-900">Aspirasi orang lain</h3>
-                    <p class="text-sm text-gray-600">Liat aspirasi orang lain</p>
-                </div>
-            </div>
-        </a>
-    </div>
 
     <!-- Stats Section -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <!-- Total Aspirasi -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <p class="text-gray-600 text-sm mb-2">Total Aspirasi Saya</p>
-            <p class="text-3xl font-bold text-gray-900">{{ $totalAspirasi }}</p>
-            <p class="text-xs text-gray-500 mt-3">Total aspirasi dikirim</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 group">
+            <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-2">Total Aspirasi</p>
+            <p class="text-4xl font-black text-gray-900 leading-none">{{ $totalAspirasi }}</p>
+            <div class="w-8 h-1 bg-blue-600 mt-4 rounded-full"></div>
         </div>
 
-        <!-- Approved Aspirasi -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <p class="text-gray-600 text-sm mb-2">Aspirasi Disetujui</p>
-            <p class="text-3xl font-bold text-green-600">{{ $aspirasiComplete }}</p>
-            <p class="text-xs text-gray-500 mt-3">Selesai diproses</p>
+        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 group">
+            <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-2">Selesai/Disetujui</p>
+            <p class="text-4xl font-black text-green-600 leading-none">{{ $aspirasiComplete }}</p>
+            <div class="w-8 h-1 bg-green-500 mt-4 rounded-full"></div>
         </div>
 
-        <!-- Pending Aspirasi -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <p class="text-gray-600 text-sm mb-2">Aspirasi Pending</p>
-            <p class="text-3xl font-bold text-yellow-600">{{ $aspirasiPending }}</p>
-            <p class="text-xs text-gray-500 mt-3">Menunggu verifikasi/proses</p>
-        </div>
-
-        <!-- My Rank -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <p class="text-gray-600 text-sm mb-2">Peringkat Kontributor</p>
-            <p class="text-3xl font-bold text-blue-600">#5</p>
-            <p class="text-xs text-gray-500 mt-3">Dari 250 siswa aktif</p>
+        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 group">
+            <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-2">Sedang Diproses</p>
+            <p class="text-4xl font-black text-yellow-600 leading-none">{{ $aspirasiPending }}</p>
+            <div class="w-8 h-1 bg-yellow-500 mt-4 rounded-full"></div>
         </div>
     </div>
 
-    <!-- Latest Aspirations Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Recent Aspirasi List -->
+    <!-- Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Recent Aspirasi -->
         <div class="lg:col-span-2">
-            <div class="bg-white rounded-lg shadow">
-                <div class="px-6 py-4 border-b border-gray-200">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-6 py-5 border-b border-gray-50 flex justify-between items-center">
                     <h3 class="text-lg font-bold text-gray-900">Aspirasi Terbaru Saya</h3>
+                    <a href="{{ route('siswa.aspirasisaya') }}" class="text-blue-600 hover:text-blue-700 font-bold text-xs uppercase tracking-tighter transition">Lihat Semua →</a>
                 </div>
-                <div class="divide-y divide-gray-200">
-                <div class="divide-y divide-gray-200">
+                <div class="divide-y divide-gray-50">
                     @forelse($latestAspirasi as $aspirasi)
-                    <a href="{{ route('siswa.aspirasi.show', $aspirasi->id) }}" class="block p-6 hover:bg-gray-50 transition cursor-pointer">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-bold text-gray-900">{{ $aspirasi->feedback_title }}</h4>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $aspirasi->status === 'complete' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                {{ ucfirst(str_replace('_', ' ', $aspirasi->status)) }}
-                            </span>
-                        </div>
-                        <p class="text-sm text-gray-600 mb-3">{{ Str::limit($aspirasi->details, 150) }}</p>
-                        <div class="flex gap-4 text-xs text-gray-500">
-                            <span>📅 {{ $aspirasi->created_at->format('d M Y') }}</span>
-                            <span>📂 {{ $aspirasi->kategori->name ?? 'Kategori' }}</span>
-                            <span>💬 {{ $aspirasi->komentars->count() }} Komentar</span>
-                        </div>
-                    </a>
+                    <div class="group">
+                        <a href="{{ route('siswa.aspirasi.show', $aspirasi->id) }}" class="block p-6 hover:bg-blue-50/20 transition-colors">
+                            <div class="flex items-center justify-between gap-4 mb-2">
+                                <h4 class="font-bold text-gray-900 text-lg leading-tight group-hover:text-blue-600 transition-colors">{{ $aspirasi->feedback_title }}</h4>
+                                <span class="shrink-0 px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest {{ $aspirasi->status === 'complete' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
+                                    {{ str_replace('_', ' ', $aspirasi->status) }}
+                                </span>
+                            </div>
+                            <p class="text-sm text-gray-500 line-clamp-2 mb-4">{{ Str::limit($aspirasi->details, 120) }}</p>
+                            <div class="flex items-center gap-4 text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+                                <span class="flex items-center gap-1">📅 {{ $aspirasi->created_at->format('d M Y') }}</span>
+                                <span class="flex items-center gap-1">📁 {{ $aspirasi->kategori->name ?? 'Lainnya' }}</span>
+                            </div>
+                        </a>
+                    </div>
                     @empty
-                    <div class="p-6 text-center text-gray-500">Belum ada aspirasi.</div>
+                    <div class="p-12 text-center">
+                        <p class="text-gray-400 text-sm font-medium">Belum ada aspirasi yang dikirimkan.</p>
+                    </div>
                     @endforelse
-                </div>
-                <div class="px-6 py-3 border-t border-gray-200 bg-gray-50 text-center">
-                    <a href="#" class="text-blue-600 hover:text-blue-900 font-medium text-sm">Lihat Semua Aspirasi →</a>
                 </div>
             </div>
         </div>
 
-        <!-- Right Sidebar -->
-        <div class="space-y-6">
-            <!-- Categories -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="font-bold text-gray-900 mb-4">Kategori Populer</h3>
+        <!-- Sidebar -->
+        <div class="space-y-8">
+            <!-- Popular Categories -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <h3 class="font-extrabold text-gray-900 mb-6 text-base tracking-tight uppercase">Kategori Populer</h3>
                 <div class="space-y-3">
-                    <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded cursor-pointer">
-                        <span class="text-sm text-gray-600">Pendidikan</span>
-                        <span class="text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded">45</span>
+                    @forelse($popularKategoris as $kategori)
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-transparent hover:border-blue-100 hover:bg-white transition-all group">
+                        <span class="text-sm font-bold text-gray-700 group-hover:text-blue-600">{{ $kategori->name }}</span>
+                        <span class="text-[10px] font-black bg-blue-600 text-white px-2 py-0.5 rounded-full">{{ $kategori->aspirasis_count }}</span>
                     </div>
-                    <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded cursor-pointer">
-                        <span class="text-sm text-gray-600">Infrastruktur</span>
-                        <span class="text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded">32</span>
-                    </div>
-                    <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded cursor-pointer">
-                        <span class="text-sm text-gray-600">Kesehatan</span>
-                        <span class="text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded">28</span>
-                    </div>
-                    <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded cursor-pointer">
-                        <span class="text-sm text-gray-600">Keamanan</span>
-                        <span class="text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded">15</span>
-                    </div>
+                    @empty
+                    <p class="text-xs text-gray-400 text-center py-4 italic">Belum ada kategori tersedia.</p>
+                    @endforelse
                 </div>
             </div>
 
-            <!-- Tips -->
-            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow p-6 text-white">
-                <h3 class="font-bold mb-3">💡 Tips</h3>
-                <ul class="space-y-2 text-sm">
-                    <li>✓ Tulislah aspirasi dengan jelas dan terperinci</li>
-                    <li>✓ Pilih kategori yang sesuai</li>
-                    <li>✓ Berikan solusi atau saran konstruktif</li>
-                    <li>✓ Hormati pendapat orang lain</li>
-                </ul>
+            <!-- Tips Card -->
+            <div class="bg-gray-900 rounded-2xl p-6 text-white relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 blur-3xl -mr-16 -mt-16"></div>
+                <h3 class="font-black text-xs uppercase tracking-widest text-blue-400 mb-4">💡 Tips Aspirasi</h3>
+                <div class="space-y-4">
+                    <div class="flex gap-3">
+                        <span class="text-blue-500 font-black">01</span>
+                        <p class="text-xs text-gray-300 leading-relaxed">Berikan judul yang mencerminkan inti aspirasi Anda agar mudah dipahami.</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <span class="text-blue-500 font-black">02</span>
+                        <p class="text-xs text-gray-300 leading-relaxed">Sertakan detail lokasi atau waktu kejadian untuk mempermudah tindak lanjut.</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <span class="text-blue-500 font-black">03</span>
+                        <p class="text-xs text-gray-300 leading-relaxed">Pilihlah bahasa yang sopan dan tawarkan solusi yang konstruktif.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

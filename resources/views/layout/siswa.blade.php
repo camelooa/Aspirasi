@@ -6,14 +6,14 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <title>Merdeka Aspirasi - Student Dashboard</title>
 </head>
-<body>
+<body class="bg-gray-100 antialiased">
     <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div class="px-8 py-4">
             <!-- Top Row: Logo and User Info -->
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center">
-                        <span class="text-white font-bold text-lg">MA</span>
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden">
+                        <img src="{{ asset('img/logo.jpg') }}" alt="Logo" class="w-full h-full object-cover">
                     </div>
                     <div>
                         <h1 class="text-lg font-bold text-gray-900">Merdeka Aspirasi</h1>
@@ -58,5 +58,7 @@
     <main>
         @yield('content')
     </main>
+
+    @include('partials.chatbot')
 </body>
 </html>

@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\aspirasi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
+use App\Mail\AspirasiRespondedMail;
 
 class FeedbackController extends Controller
 {
@@ -20,7 +23,7 @@ class FeedbackController extends Controller
                   ->orWhere('details', 'like', "%{$search}%")
                   ->orWhereHas('user', function($subQ) use ($search) {
                       $subQ->where('username', 'like', "%{$search}%")
-                           ->orWhere('name', 'like', "%{$search}%");
+                           ->orWhere('full_name', 'like', "%{$search}%");
                   });
             });
         }
@@ -39,13 +42,13 @@ class FeedbackController extends Controller
 
     public function show($id)
     {
-        $feedback = aspirasi::with(['user', 'kategori', 'komentars.user'])->findOrFail($id);
+        $feedback = aspirasi::with(['user', 'kategori'])->findOrFail($id);
         return view('admin.feedback-detail', compact('feedback'));
     }
 
     public function reply(Request $request, $id)
     {
-        $aspirasi = aspirasi::findOrFail($id);
+        $aspirasi = aspirasi::with('user', 'kategori')->findOrFail($id);
         
         $request->validate([
             'admin_response' => 'required|string'
@@ -53,9 +56,18 @@ class FeedbackController extends Controller
 
         $aspirasi->update([
             'admin_response' => $request->admin_response,
-            'status' => 'complete' // Optionally mark as complete when replied? Or let them choose. Let's keep status separate but defaulting to complete is common. I'll just update response. 
-            // Actually, usually a reply means it's being addressed. Let's just update response.
+            'admin_id' => Auth::id(),
+            'status' => 'complete'
         ]);
+
+        // Send email notification to student
+        if ($aspirasi->user && $aspirasi->user->email) {
+            try {
+                Mail::to($aspirasi->user->email)->send(new AspirasiRespondedMail($aspirasi));
+            } catch (\Exception $e) {
+                \Log::error('Failed to send response email: ' . $e->getMessage());
+            }
+        }
 
         return back()->with('success', 'Balasan berhasil dikirim.');
     }
@@ -71,6 +83,15 @@ class FeedbackController extends Controller
         $aspirasi->update([
             'status' => $request->status
         ]);
+
+        // Send email notification to student if status completed
+        if ($request->status === 'complete' && $aspirasi->user && $aspirasi->user->email) {
+            try {
+                Mail::to($aspirasi->user->email)->send(new AspirasiRespondedMail($aspirasi));
+            } catch (\Exception $e) {
+                \Log::error('Failed to send status update email: ' . $e->getMessage());
+            }
+        }
 
         return back()->with('success', 'Status updated successfully');
     }

@@ -15,8 +15,15 @@ class User extends Authenticatable
     protected $fillable = [
         'username',
         'full_name',
+        'email',
+        'otp_code',
+        'otp_expires_at',
         'roles',
         'password',
+    ];
+    
+    protected $casts = [
+        'otp_expires_at' => 'datetime',
     ];
 
     protected $hidden = [
@@ -27,12 +34,17 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'password' => 'hashed',
+            //
         ];
     }
 
     public function aspirasis()
     {
         return $this->hasMany(\App\Models\aspirasi::class, 'user_id');
+    }
+
+    public function kategoris()
+    {
+        return $this->hasMany(\App\Models\Kategori::class, 'admin_id');
     }
 }

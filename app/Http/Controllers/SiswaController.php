@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use App\Models\Kategori;
 use App\Models\aspirasi as AspirasiModel;
+use App\Mail\AspirasiCreatedMail;
 
 class SiswaController extends Controller
 {
@@ -17,9 +19,14 @@ class SiswaController extends Controller
         $aspirasiPending = $user->aspirasis()->where('status', 'on_progress')->count();
         
         $latestAspirasi = $user->aspirasis()
-            ->with(['kategori', 'komentars'])
+            ->with(['kategori'])
             ->latest()
             ->take(3)
+            ->get();
+
+        $popularKategoris = Kategori::withCount('aspirasis')
+            ->orderBy('aspirasis_count', 'desc')
+            ->take(4)
             ->get();
 
         return view('siswa.dashboardsiswa', [
@@ -28,6 +35,7 @@ class SiswaController extends Controller
             'aspirasiComplete' => $aspirasiComplete,
             'aspirasiPending' => $aspirasiPending,
             'latestAspirasi' => $latestAspirasi,
+            'popularKategoris' => $popularKategoris,
         ]);
     }
 
@@ -76,27 +84,29 @@ class SiswaController extends Controller
 
         $asp->save();
 
+        // Send email notification to category email
+        $category = Kategori::find($data['category_id']);
+        
+        $recipient = $category->email;
+
+        if ($recipient) {
+            try {
+                Mail::to($recipient)->send(new AspirasiCreatedMail($asp));
+            } catch (\Exception $e) {
+                // Log error but don't fail the aspiration creation
+                \Log::error('Failed to send aspiration email: ' . $e->getMessage());
+            }
+        }
+
         return redirect()->route('siswa.aspirasisaya')->with('success', 'Aspirasi berhasil dikirim');
     }
 
-    // show aspirasi from other users
-    public function aspirasioranglain()
-    {
-        // fetch all aspirasi except current user's
-        $aspirasis = AspirasiModel::where('user_id', '!=', auth()->user()->id)
-            ->latest()
-            ->get();
 
-        return view('siswa.pageaspirasioranglain', [
-            'aspirasis' => $aspirasis,
-            'user' => Auth::user()
-        ]);
-    }
-
-    // show aspirasi detail with comments
     public function showAspirasi($id)
     {
-        $aspirasi = AspirasiModel::with(['user', 'kategori', 'komentars.user'])->findOrFail($id);
+        $aspirasi = AspirasiModel::where('user_id', Auth::id())
+            ->with(['user', 'kategori', 'admin'])
+            ->findOrFail($id);
 
         return view('siswa.detail-aspirasi', [
             'aspirasi' => $aspirasi,
