@@ -18,5 +18,7 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-nano .gitignore
+
+# Docker runtime data (volumes) - do not commit
+/.docker/db/data/
 

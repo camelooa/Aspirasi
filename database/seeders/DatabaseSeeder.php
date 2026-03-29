@@ -11,35 +11,36 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // SUPER ADMIN
-        if (!User::where('username', 'superadmin')->exists()) {
-            User::create([
-                'username' => 'superadmin',
+        // Demo Users (email-based login + OTP)
+        User::updateOrCreate(
+            ['username' => 'superadmin'],
+            [
+                'email' => 'superadmin@example.com',
                 'full_name' => 'Super Administrator',
                 'roles' => 'super_admin',
                 'password' => Hash::make('super123'),
-            ]);
-        }
+            ]
+        );
 
-        // ADMIN
-        if (!User::where('username', 'admin')->exists()) {
-            User::create([
-                'username' => 'admin',
+        User::updateOrCreate(
+            ['username' => 'admin'],
+            [
+                'email' => 'admin@example.com',
                 'full_name' => 'Administrator',
                 'roles' => 'admin',
                 'password' => Hash::make('admin123'),
-            ]);
-        }
+            ]
+        );
 
-        // SISWA
-        if (!User::where('username', 'siswa')->exists()) {
-            User::create([
-                'username' => 'siswa',
+        User::updateOrCreate(
+            ['username' => 'siswa'],
+            [
+                'email' => 'siswa@example.com',
                 'full_name' => 'Siswa Demo',
                 'roles' => 'siswa',
                 'password' => Hash::make('siswa123'),
-            ]);
-        }
+            ]
+        );
 
         // KATEGORIS
         if (Kategori::count() === 0) {
