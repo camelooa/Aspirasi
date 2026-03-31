@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use App\Models\Kategori;
 use App\Models\aspirasi as AspirasiModel;
+use App\Models\User;
 use App\Mail\AspirasiCreatedMail;
 
 class SiswaController extends Controller
@@ -24,18 +25,12 @@ class SiswaController extends Controller
             ->take(3)
             ->get();
 
-        $popularKategoris = Kategori::withCount('aspirasis')
-            ->orderBy('aspirasis_count', 'desc')
-            ->take(4)
-            ->get();
-
         return view('siswa.dashboardsiswa', [
             'user' => $user,
             'totalAspirasi' => $totalAspirasi,
             'aspirasiComplete' => $aspirasiComplete,
             'aspirasiPending' => $aspirasiPending,
             'latestAspirasi' => $latestAspirasi,
-            'popularKategoris' => $popularKategoris,
         ]);
     }
 
@@ -84,14 +79,29 @@ class SiswaController extends Controller
 
         $asp->save();
 
-        // Send email notification to category email
+        // Send email notification to admins (and category email if set)
         $category = Kategori::find($data['category_id']);
-        
-        $recipient = $category->email;
+        $categoryEmail = $category?->email;
 
-        if ($recipient) {
+        $adminEmails = User::query()
+            ->whereIn('roles', ['admin', 'super_admin'])
+            ->whereNotNull('email')
+            ->pluck('email')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        $to = $categoryEmail;
+        $bcc = $adminEmails;
+
+        if (!$to && count($bcc) > 0) {
+            $to = array_shift($bcc);
+        }
+
+        if ($to) {
             try {
-                Mail::to($recipient)->send(new AspirasiCreatedMail($asp));
+                Mail::to($to)->bcc($bcc)->send(new AspirasiCreatedMail($asp));
             } catch (\Exception $e) {
                 // Log error but don't fail the aspiration creation
                 \Log::error('Failed to send aspiration email: ' . $e->getMessage());

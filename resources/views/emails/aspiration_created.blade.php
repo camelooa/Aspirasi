@@ -23,7 +23,7 @@
 
                     <tr>
                         <td style="background:#FFFFFF; border:1px solid #E2DDD5; border-top:0; padding:22px; border-radius:0 0 16px 16px;">
-                            <p style="margin:0 0 10px; font-family: Arial, Helvetica, sans-serif; font-size:14px; color:#0F172A;">Halo <strong>{{ $pj->nama ?? 'Penanggung Jawab' }}</strong>,</p>
+                            <p style="margin:0 0 10px; font-family: Arial, Helvetica, sans-serif; font-size:14px; color:#0F172A;">Halo <strong>Tim {{ $category->name }}</strong>,</p>
                             <p style="margin:0 0 16px; font-family: Arial, Helvetica, sans-serif; font-size:14px; color:#334155;">Sebuah aspirasi baru telah dibuat oleh siswa untuk kategori <strong>{{ $category->name }}</strong>.</p>
 
                             <div style="border:1px solid #E2DDD5; border-left:4px solid #E5A411; border-radius:14px; padding:16px; background:#FFFFFF;">

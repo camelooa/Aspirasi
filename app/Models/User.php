@@ -16,6 +16,8 @@ class User extends Authenticatable
         'username',
         'full_name',
         'email',
+        'nis',
+        'kelas',
         'roles',
         'password',
     ];
@@ -35,10 +37,5 @@ class User extends Authenticatable
     public function aspirasis()
     {
         return $this->hasMany(\App\Models\aspirasi::class, 'user_id');
-    }
-
-    public function kategoris()
-    {
-        return $this->hasMany(\App\Models\Kategori::class, 'admin_id');
     }
 }

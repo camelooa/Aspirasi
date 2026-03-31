@@ -75,6 +75,9 @@
                                     <span class="inline-flex items-center gap-2 rounded-full px-3 py-1" style="background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.06);">
                                         @{{ $u->username }}
                                     </span>
+                                    <span class="inline-flex items-center gap-2 rounded-full px-3 py-1" style="background: rgba(29,109,181,0.08); border: 1px solid rgba(29,109,181,0.16);">
+                                        {{ $u->email ?: '-' }}
+                                    </span>
                                     <span class="inline-flex items-center gap-2 rounded-full px-3 py-1" style="background: rgba(12,34,64,0.03); border: 1px solid rgba(12,34,64,0.06);">
                                         Terdaftar: {{ $u->created_at ? $u->created_at->format('d M Y') : '-' }}
                                     </span>

@@ -26,6 +26,9 @@ class UserController extends Controller
         $request->validate([
             'username' => ['required', 'string', 'max:255', 'unique:users'],
             'full_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'nis' => ['nullable', 'string', 'max:64', 'unique:users,nis'],
+            'kelas' => ['nullable', 'string', 'max:64'],
             'roles' => ['required', Rule::in(['admin', 'siswa', 'super_admin'])],
             'password' => ['required', 'string', 'min:4', 'confirmed'],
         ]);
@@ -33,6 +36,9 @@ class UserController extends Controller
         User::create([
             'username' => $request->username,
             'full_name' => $request->full_name,
+            'email' => $request->email,
+            'nis' => $request->nis,
+            'kelas' => $request->kelas,
             'roles' => $request->roles,
             'password' => Hash::make($request->password),
         ]);

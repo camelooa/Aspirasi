@@ -128,27 +128,4 @@ Route::middleware(['auth', 'role:admin,super_admin'])
 
         Route::post('/users', [UserController::class, 'store'])
             ->name('admin.users.store');
-        /*
-        | Penugasan & Manajemen Personil (Consolidated)
-        */
-        Route::prefix('category-assignments')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Admin\CategoryAssignmentController::class, 'index'])
-                ->name('admin.category-assignments.index');
-                
-            // Person Management
-            Route::post('/person', [\App\Http\Controllers\Admin\CategoryAssignmentController::class, 'storePerson'])
-                ->name('admin.category-assignments.store-person');
-            Route::put('/person/{id}', [\App\Http\Controllers\Admin\CategoryAssignmentController::class, 'updatePerson'])
-                ->name('admin.category-assignments.update-person');
-            Route::delete('/person/{id}', [\App\Http\Controllers\Admin\CategoryAssignmentController::class, 'destroyPerson'])
-                ->name('admin.category-assignments.destroy-person');
-                
-            // Assignments
-            Route::post('/{pj_id}/assign', [\App\Http\Controllers\Admin\CategoryAssignmentController::class, 'updateAssignments'])
-                ->name('admin.category-assignments.update-assignments');
-
-            // Category Management
-            Route::put('/category/{id}', [\App\Http\Controllers\Admin\CategoryAssignmentController::class, 'updateCategory'])
-                ->name('admin.category-assignments.update-category');
-        });
     });

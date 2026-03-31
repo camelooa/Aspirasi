@@ -114,14 +114,17 @@
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: var(--bg); }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        /* Details/summary (dropdown) */
+        summary::-webkit-details-marker { display: none; }
     </style>
 </head>
 <body class="min-h-screen antialiased">
-    <header class="sticky top-0 z-40 border-b border-black/[0.04] bg-white/75 backdrop-blur">
+    <header class="sticky top-0 z-40 border-b border-black/[0.04] bg-white/75 backdrop-blur shadow-sm">
         <div class="max-w-7xl mx-auto px-4 md:px-8 py-4">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl overflow-hidden ring-1 ring-black/[0.05] shadow-sm bg-white">
+                    <div class="w-9 h-9 md:w-10 md:h-10 rounded-2xl overflow-hidden ring-1 ring-black/[0.05] shadow-sm bg-white">
                         <img src="{{ asset('img/logo.jpg') }}" alt="Logo" class="w-full h-full object-cover">
                     </div>
                     <div>
@@ -132,26 +135,55 @@
 
                 <nav class="flex flex-wrap items-center gap-2">
                     <div class="flex flex-wrap items-center gap-1.5 lg:pr-4 lg:border-r border-black/[0.05]">
-                        <x-nav-link-siswa href="{{ route('siswa.dashboard') }}" :active="request()->routeIs('siswa.dashboard')" icon="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 11l4-4m-9-8l4 4">Dashboard</x-nav-link-siswa>
-                        <x-nav-link-siswa href="{{ route('siswa.aspirasisaya') }}" :active="request()->routeIs('siswa.aspirasisaya') || request()->routeIs('siswa.aspirasi.show')" icon="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4a1 1 0 011-1h16a1 1 0 011 1v2.757a1 1 0 01-.105.447l-3.423 5.134a1 1 0 00-.105.447v2.757a1 1 0 01-1 1h-10a1 1 0 01-1-1v-2.757a1 1 0 00-.105-.447L3.106 7.204A1 1 0 013 6.757V4z">Aspirasi Saya</x-nav-link-siswa>
+                        <x-nav-link-siswa href="{{ route('siswa.dashboard') }}" :active="request()->routeIs('siswa.dashboard')" icon="M3 9.75L12 4l9 5.75V20a1 1 0 01-1 1h-5v-6a2 2 0 00-2-2h-2a2 2 0 00-2 2v6H4a1 1 0 01-1-1V9.75z">Dashboard</x-nav-link-siswa>
+                        <x-nav-link-siswa href="{{ route('siswa.aspirasisaya') }}" :active="request()->routeIs('siswa.aspirasisaya') || request()->routeIs('siswa.aspirasi.show')" icon="M9 5h6a2 2 0 012 2v12a2 2 0 01-2 2H9a2 2 0 01-2-2V7a2 2 0 012-2zm0 4h6m-6 4h6m-6 4h3">Aspirasi Saya</x-nav-link-siswa>
                     </div>
 
-                    <div class="flex items-center gap-4 lg:pl-4">
-                        <div class="hidden lg:block text-right">
-                            <p class="text-sm font-bold text-gray-900 leading-none">{{ auth()->user()->full_name ?? auth()->user()->name }}</p>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.18em] mt-1">Siswa</p>
-                        </div>
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-extrabold shadow-sm" style="background: linear-gradient(165deg, #071525 0%, #0C2240 55%, #163D6B 100%);">
-                            {{ strtoupper(substr(auth()->user()->full_name ?? auth()->user()->name ?? 'A', 0, 2)) }}
-                        </div>
-                        <form action="{{ route('logout') }}" method="POST" class="inline">
-                            @csrf
-                            <button type="submit" class="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition duration-200" title="Logout">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    <div class="flex items-center gap-3 lg:pl-4">
+                        <!-- Notifications (responses) -->
+                        <a href="{{ route('siswa.aspirasisaya') }}" class="relative p-2.5 text-slate-500 hover:text-slate-900 hover:bg-black/[0.03] rounded-xl transition-colors duration-150 ease-out" title="Notifikasi">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0a3 3 0 01-6 0m6 0H9" />
+                            </svg>
+                            <span class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] leading-[18px] font-extrabold text-white text-center bg-red-600">
+                                {{ $siswaNotificationCount ?? 0 }}
+                            </span>
+                        </a>
+
+                        <!-- User dropdown -->
+                        <details class="relative">
+                            <summary class="list-none cursor-pointer flex items-center gap-3 rounded-2xl px-2 py-1.5 hover:bg-black/[0.03] transition-colors duration-150 ease-out">
+                                <div class="w-9 h-9 rounded-full flex items-center justify-center text-white font-extrabold shadow-sm" style="background: linear-gradient(165deg, #071525 0%, #0C2240 55%, #163D6B 100%);">
+                                    {{ strtoupper(substr(auth()->user()->full_name ?? auth()->user()->name ?? 'A', 0, 2)) }}
+                                </div>
+                                <div class="hidden lg:block leading-tight">
+                                    <p class="text-[13px] font-bold text-slate-700">{{ auth()->user()->full_name ?? auth()->user()->name }}</p>
+                                    <p class="text-[11px] font-semibold text-slate-400">Siswa</p>
+                                </div>
+                                <svg class="hidden lg:block w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
-                            </button>
-                        </form>
+                            </summary>
+
+                            <div class="absolute right-0 mt-2 w-56 card shadow-sm p-2 z-50">
+                                <a href="#" onclick="return false;" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-black/[0.03] transition-colors duration-150 ease-out">
+                                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    Profile
+                                </a>
+                                <a href="#" onclick="return false;" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-black/[0.03] transition-colors duration-150 ease-out">
+                                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100 4m0-4a2 2 0 110 4m12-4a2 2 0 100 4m0-4a2 2 0 110 4M6 12H4m2 0a2 2 0 104 0m-4 0a2 2 0 114 0m10 0h2m-2 0a2 2 0 104 0m-4 0a2 2 0 114 0M12 20v-2m0 2a2 2 0 100-4m0 4a2 2 0 110-4"/></svg>
+                                    Pengaturan
+                                </a>
+                                <div class="my-1 h-px bg-black/[0.06]"></div>
+                                <form action="{{ route('logout') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors duration-150 ease-out">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                        Keluar
+                                    </button>
+                                </form>
+                            </div>
+                        </details>
                     </div>
                 </nav>
             </div>

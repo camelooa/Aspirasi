@@ -2,8 +2,6 @@
 
 @section('content')
 @php
-    $weeklyTotals = array_map(fn($d) => ($d['complete'] ?? 0) + ($d['on_progress'] ?? 0), $weeklyData);
-    $weeklyMax = max(5, ...array_values($weeklyTotals));
     $topCategories = $countsByCategory->sortByDesc('total')->take(8);
 @endphp
 
@@ -12,8 +10,8 @@
 
         <!-- Header Row -->
         <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-7">
-                <div class="card p-6 md:p-8 shadow-sm relative overflow-hidden">
+            <div class="lg:col-span-7 h-full">
+                <div class="card p-6 md:p-8 shadow-sm relative overflow-hidden h-full">
                     <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(circle at 20% 15%, rgba(229,164,17,0.08), transparent 45%), radial-gradient(circle at 85% 30%, rgba(29,109,181,0.08), transparent 55%);"></div>
                     <div class="relative">
                         <p class="text-[10px] font-black uppercase tracking-[0.22em] text-gray-400">Dashboard Admin</p>
@@ -55,122 +53,7 @@
                 </div>
             </div>
 
-            <div class="lg:col-span-5">
-                <div class="card p-6 md:p-8 shadow-sm h-full">
-                    <div class="flex items-start justify-between gap-4">
-                        <div>
-                            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-gray-400">Kinerja</p>
-                            <h3 class="font-display text-lg font-extrabold tracking-tight text-gray-900 mt-2">Kualitas Respon Admin</h3>
-                            <p class="text-sm text-gray-600 mt-1">Ringkasan dari aktivitas pengelolaan aspirasi.</p>
-                        </div>
-
-                        <div class="shrink-0">
-                            @php
-                                $deg = max(0, min(100, $responseRate)) * 3.6;
-                            @endphp
-                            <div class="relative w-24 h-24 rounded-full" style="background: conic-gradient(var(--accent) {{ $deg }}deg, rgba(0,0,0,0.06) 0);">
-                                <div class="absolute inset-[10px] rounded-full bg-white border border-black/[0.06] flex items-center justify-center">
-                                    <div class="text-center">
-                                        <p class="font-display text-xl font-extrabold text-gray-900 leading-none">{{ $responseRate }}%</p>
-                                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 mt-1">Respon</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 space-y-5">
-                        <div>
-                            <div class="flex items-end justify-between">
-                                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-gray-400">Ditinjau</p>
-                                <p class="font-display text-lg font-extrabold text-gray-900">{{ $reviewedRate }}%</p>
-                            </div>
-                            <div class="mt-2 h-2 rounded-full overflow-hidden" style="background: rgba(0,0,0,0.06);">
-                                <div class="h-full rounded-full" style="width: {{ $reviewedRate }}%; background: var(--navy);"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="flex items-end justify-between">
-                                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-gray-400">Selesai</p>
-                                <p class="font-display text-lg font-extrabold text-gray-900">{{ $completedRate }}%</p>
-                            </div>
-                            <div class="mt-2 h-2 rounded-full overflow-hidden" style="background: rgba(0,0,0,0.06);">
-                                <div class="h-full rounded-full" style="width: {{ $completedRate }}%; background: var(--amber);"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 grid grid-cols-3 gap-2">
-                        <div class="rounded-2xl p-3 text-center" style="background: rgba(12,34,64,0.03); border: 1px solid rgba(12,34,64,0.06);">
-                            <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Hari ini</p>
-                            <p class="font-display text-xl font-extrabold text-gray-900 mt-1">{{ $activeToday }}</p>
-                        </div>
-                        <div class="rounded-2xl p-3 text-center" style="background: rgba(29,109,181,0.04); border: 1px solid rgba(29,109,181,0.12);">
-                            <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Minggu</p>
-                            <p class="font-display text-xl font-extrabold text-gray-900 mt-1">{{ $activeThisWeek }}</p>
-                        </div>
-                        <div class="rounded-2xl p-3 text-center" style="background: rgba(229,164,17,0.06); border: 1px solid rgba(229,164,17,0.16);">
-                            <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Bulan</p>
-                            <p class="font-display text-xl font-extrabold text-gray-900 mt-1">{{ $activeThisMonth }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Weekly + Categories -->
-        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-7">
-                <div class="card p-6 md:p-8 shadow-sm">
-                    <div class="flex items-start justify-between gap-4">
-                        <div>
-                            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-gray-400">7 Hari Terakhir</p>
-                            <h3 class="font-display text-lg font-extrabold tracking-tight text-gray-900 mt-2">Denyut Mingguan</h3>
-                            <p class="text-sm text-gray-600 mt-1">Perbandingan selesai vs proses per hari.</p>
-                        </div>
-                        <div class="hidden sm:flex items-center gap-3">
-                            <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded" style="background: var(--accent);"></span>
-                                <span class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Selesai</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded" style="background: var(--amber);"></span>
-                                <span class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Proses</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 space-y-3">
-                        @foreach($weeklyData as $day)
-                            @php
-                                $complete = $day['complete'] ?? 0;
-                                $progress = $day['on_progress'] ?? 0;
-                                $total = $complete + $progress;
-                                $cW = $weeklyMax > 0 ? (($complete / $weeklyMax) * 100) : 0;
-                                $pW = $weeklyMax > 0 ? (($progress / $weeklyMax) * 100) : 0;
-                            @endphp
-                            <div class="flex items-center gap-4">
-                                <div class="w-14">
-                                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">{{ substr($day['day_name'], 0, 3) }}</p>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="h-3 rounded-full overflow-hidden" style="background: rgba(0,0,0,0.06);">
-                                        <div class="h-full" style="width: {{ $cW }}%; background: var(--accent); float:left;"></div>
-                                        <div class="h-full" style="width: {{ $pW }}%; background: var(--amber); float:left;"></div>
-                                    </div>
-                                </div>
-                                <div class="w-20 text-right">
-                                    <p class="font-display text-sm font-extrabold text-gray-900">{{ $total }}</p>
-                                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Total</p>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-
-            <div class="lg:col-span-5">
+            <div class="lg:col-span-5 h-full">
                 <div class="card p-6 md:p-8 shadow-sm h-full">
                     <p class="text-[10px] font-black uppercase tracking-[0.22em] text-gray-400">Kategori</p>
                     <h3 class="font-display text-lg font-extrabold tracking-tight text-gray-900 mt-2">Paling Sering Dilaporkan</h3>

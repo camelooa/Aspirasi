@@ -48,7 +48,6 @@ class AspirasiCreatedMail extends Mailable
                 'aspirasi' => $this->aspirasi,
                 'student' => $this->student,
                 'category' => $this->category,
-                'pj' => $this->category->penanggungJawab,
             ],
         );
     }

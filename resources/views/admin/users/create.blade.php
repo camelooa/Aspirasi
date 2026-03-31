@@ -36,6 +36,26 @@
                 </div>
 
                 <div>
+                    <label class="block text-[11px] font-black uppercase tracking-[0.18em] text-gray-400 mb-2">Email</label>
+                    <input type="email" name="email" value="{{ old('email') }}" required class="fi w-full px-4 py-3 text-[13.5px] text-gray-900 font-semibold">
+                    @error('email') <p class="text-red-600 text-[12px] font-semibold mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[11px] font-black uppercase tracking-[0.18em] text-gray-400 mb-2">NIS (opsional)</label>
+                        <input type="text" name="nis" value="{{ old('nis') }}" class="fi w-full px-4 py-3 text-[13.5px] text-gray-900 font-semibold">
+                        @error('nis') <p class="text-red-600 text-[12px] font-semibold mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-black uppercase tracking-[0.18em] text-gray-400 mb-2">Kelas (opsional)</label>
+                        <input type="text" name="kelas" value="{{ old('kelas') }}" class="fi w-full px-4 py-3 text-[13.5px] text-gray-900 font-semibold">
+                        @error('kelas') <p class="text-red-600 text-[12px] font-semibold mt-1">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+
+                <div>
                     <label class="block text-[11px] font-black uppercase tracking-[0.18em] text-gray-400 mb-2">Role</label>
                     <select name="roles" required class="fi w-full px-4 py-3 text-[13.5px] text-gray-900 font-semibold">
                         <option value="siswa">Siswa</option>
