@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FeedbackController;
 use App\Http\Controllers\Admin\LogController;
@@ -35,7 +34,7 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
-| GUEST ONLY (LOGIN + OTP)
+| GUEST ONLY (LOGIN)
 |--------------------------------------------------------------------------
 */
 
@@ -49,16 +48,6 @@ Route::middleware('guest')->group(function () {
 
     Route::post('/login', [LoginController::class, 'login'])
         ->name('login.process');
-
-
-    /*
-    | OTP
-    */
-    Route::get('/otp', [OtpController::class, 'index'])   // tampilkan form
-        ->name('otp.form');
-
-    Route::post('/otp', [OtpController::class, 'verify']) // verifikasi
-        ->name('otp.verify');
 });
 
 

@@ -1,310 +1,267 @@
 @extends('layout.admin')
 
 @section('content')
-<div class="p-4 md:p-8 space-y-8 bg-gray-50 min-h-screen">
-    <!-- Header/Greeting -->
-    <div class="relative overflow-hidden rounded-3xl bg-gray-900 p-8 md:p-12 text-white shadow-2xl">
-        <div class="absolute right-0 top-0 w-64 h-64 bg-blue-600 bg-opacity-20 filter blur-3xl -mr-20 -mt-20"></div>
-        <div class="absolute left-0 bottom-0 w-64 h-64 bg-indigo-600 bg-opacity-10 filter blur-3xl -ml-20 -mb-20"></div>
-        
-        <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="text-center md:text-left">
-                <h2 class="text-3xl md:text-4xl font-black tracking-tight mb-2">
-                    Halo, <span class="text-blue-400">{{ auth()->user()->username ?? 'Administrator' }}</span> 👋
-                </h2>
-                <p class="text-gray-400 font-medium max-w-md">Panel manajemen aspirasi. Pantau dan tanggapi setiap masukan dari siswa dengan cepat.</p>
-            </div>
-            <div class="flex gap-3">
-                <a href="{{ route('admin.feedback') }}" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold transition-all transform active:scale-95 shadow-lg">
-                    Kelola Feedback
-                </a>
-            </div>
-        </div>
-    </div>
+@php
+    $weeklyTotals = array_map(fn($d) => ($d['complete'] ?? 0) + ($d['on_progress'] ?? 0), $weeklyData);
+    $weeklyMax = max(5, ...array_values($weeklyTotals));
+    $topCategories = $countsByCategory->sortByDesc('total')->take(8);
+@endphp
 
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Total Card -->
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
-                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                </div>
-                <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase tracking-tight">Total</span>
-            </div>
-            <p class="text-4xl font-black text-gray-900 leading-none mb-1">{{ $totalFeedback }}</p>
-            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Aspirasi Masuk</p>
-        </div>
+<div class="px-4 md:px-8 py-8">
+    <div class="max-w-7xl mx-auto space-y-6">
 
-        <!-- Selesai Card -->
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center transition-colors">
-                    <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <span class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg uppercase tracking-tight">Selesai</span>
-            </div>
-            <p class="text-4xl font-black text-emerald-600 leading-none mb-1">{{ $totalCompleted }}</p>
-            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Berhasil Ditangani</p>
-        </div>
+        <!-- Header Row -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-7">
+                <div class="card p-6 md:p-8 shadow-sm relative overflow-hidden">
+                    <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(circle at 20% 15%, rgba(229,164,17,0.08), transparent 45%), radial-gradient(circle at 85% 30%, rgba(29,109,181,0.08), transparent 55%);"></div>
+                    <div class="relative">
+                        <p class="text-[10px] font-black uppercase tracking-[0.22em] text-gray-400">Dashboard Admin</p>
+                        <h2 class="font-display text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900 mt-2">
+                            Ringkasan hari ini untuk <span style="color: var(--navy);">{{ auth()->user()->username ?? 'Administrator' }}</span>
+                        </h2>
+                        <p class="text-sm text-gray-600 mt-2 max-w-xl">Pantau aspirasi, cek performa respon, dan lihat antrian tindakan dalam satu tempat.</p>
 
-        <!-- Proses Card -->
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-amber-50 group-hover:bg-amber-100 flex items-center justify-center transition-colors">
-                    <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <span class="text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-1 rounded-lg uppercase tracking-tight">Proses</span>
-            </div>
-            <p class="text-4xl font-black text-amber-600 leading-none mb-1">{{ $totalInProgress }}</p>
-            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Masih Ditinjau</p>
-        </div>
+                        <div class="mt-5 flex flex-wrap gap-2">
+                            <a href="{{ route('admin.feedback') }}" class="btn inline-flex items-center gap-2 px-5 py-3 rounded-2xl text-white font-bold text-sm shadow-sm">
+                                Kelola Feedback
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                            </a>
+                            <a href="{{ route('admin.users.index') }}" class="btn-soft inline-flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-sm">
+                                Manajemen User
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-4-4h-1m-4 6H2v-2a4 4 0 014-4h4m6-6a4 4 0 11-8 0 4 4 0 018 0zm6 2a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </a>
+                        </div>
 
-        <!-- Users Card -->
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-purple-50 group-hover:bg-purple-100 flex items-center justify-center transition-colors">
-                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <div class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div class="rounded-2xl p-4" style="background: rgba(12,34,64,0.03); border: 1px solid rgba(12,34,64,0.06);">
+                                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Masuk</p>
+                                <p class="font-display text-2xl font-extrabold text-gray-900 mt-1">{{ $totalFeedback }}</p>
+                            </div>
+                            <div class="rounded-2xl p-4" style="background: rgba(29,109,181,0.06); border: 1px solid rgba(29,109,181,0.14);">
+                                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Selesai</p>
+                                <p class="font-display text-2xl font-extrabold text-gray-900 mt-1">{{ $totalCompleted }}</p>
+                            </div>
+                            <div class="rounded-2xl p-4" style="background: rgba(229,164,17,0.08); border: 1px solid rgba(229,164,17,0.18);">
+                                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Diproses</p>
+                                <p class="font-display text-2xl font-extrabold text-gray-900 mt-1">{{ $totalInProgress }}</p>
+                            </div>
+                            <div class="rounded-2xl p-4" style="background: rgba(12,34,64,0.03); border: 1px solid rgba(12,34,64,0.06);">
+                                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Pengguna</p>
+                                <p class="font-display text-2xl font-extrabold text-gray-900 mt-1">{{ $totalUsers }}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <span class="text-[10px] font-black text-purple-600 bg-purple-50 px-2 py-1 rounded-lg uppercase tracking-tight">Akun</span>
             </div>
-            <p class="text-4xl font-black text-purple-600 leading-none mb-1">{{ $totalUsers }}</p>
-            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Pengguna</p>
-        </div>
-    </div>
 
-    <!-- Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Weekly Activity -->
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
-            <div class="flex flex-col sm:flex-row justify-between items-start mb-8 gap-4">
-                <div>
-                    <h3 class="text-lg font-black text-gray-900 uppercase tracking-tighter">Aktivitas Mingguan</h3>
-                    <p class="text-sm text-gray-400 font-medium">Statistik aspirasi 7 hari terakhir</p>
+            <div class="lg:col-span-5">
+                <div class="card p-6 md:p-8 shadow-sm h-full">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-gray-400">Kinerja</p>
+                            <h3 class="font-display text-lg font-extrabold tracking-tight text-gray-900 mt-2">Kualitas Respon Admin</h3>
+                            <p class="text-sm text-gray-600 mt-1">Ringkasan dari aktivitas pengelolaan aspirasi.</p>
+                        </div>
+
+                        <div class="shrink-0">
+                            @php
+                                $deg = max(0, min(100, $responseRate)) * 3.6;
+                            @endphp
+                            <div class="relative w-24 h-24 rounded-full" style="background: conic-gradient(var(--accent) {{ $deg }}deg, rgba(0,0,0,0.06) 0);">
+                                <div class="absolute inset-[10px] rounded-full bg-white border border-black/[0.06] flex items-center justify-center">
+                                    <div class="text-center">
+                                        <p class="font-display text-xl font-extrabold text-gray-900 leading-none">{{ $responseRate }}%</p>
+                                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 mt-1">Respon</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 space-y-5">
+                        <div>
+                            <div class="flex items-end justify-between">
+                                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-gray-400">Ditinjau</p>
+                                <p class="font-display text-lg font-extrabold text-gray-900">{{ $reviewedRate }}%</p>
+                            </div>
+                            <div class="mt-2 h-2 rounded-full overflow-hidden" style="background: rgba(0,0,0,0.06);">
+                                <div class="h-full rounded-full" style="width: {{ $reviewedRate }}%; background: var(--navy);"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex items-end justify-between">
+                                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-gray-400">Selesai</p>
+                                <p class="font-display text-lg font-extrabold text-gray-900">{{ $completedRate }}%</p>
+                            </div>
+                            <div class="mt-2 h-2 rounded-full overflow-hidden" style="background: rgba(0,0,0,0.06);">
+                                <div class="h-full rounded-full" style="width: {{ $completedRate }}%; background: var(--amber);"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 grid grid-cols-3 gap-2">
+                        <div class="rounded-2xl p-3 text-center" style="background: rgba(12,34,64,0.03); border: 1px solid rgba(12,34,64,0.06);">
+                            <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Hari ini</p>
+                            <p class="font-display text-xl font-extrabold text-gray-900 mt-1">{{ $activeToday }}</p>
+                        </div>
+                        <div class="rounded-2xl p-3 text-center" style="background: rgba(29,109,181,0.04); border: 1px solid rgba(29,109,181,0.12);">
+                            <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Minggu</p>
+                            <p class="font-display text-xl font-extrabold text-gray-900 mt-1">{{ $activeThisWeek }}</p>
+                        </div>
+                        <div class="rounded-2xl p-3 text-center" style="background: rgba(229,164,17,0.06); border: 1px solid rgba(229,164,17,0.16);">
+                            <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Bulan</p>
+                            <p class="font-display text-xl font-extrabold text-gray-900 mt-1">{{ $activeThisMonth }}</p>
+                        </div>
+                    </div>
                 </div>
-                <!-- Legend -->
-                <div class="flex gap-4">
+            </div>
+        </section>
+
+        <!-- Weekly + Categories -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-7">
+                <div class="card p-6 md:p-8 shadow-sm">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-gray-400">7 Hari Terakhir</p>
+                            <h3 class="font-display text-lg font-extrabold tracking-tight text-gray-900 mt-2">Denyut Mingguan</h3>
+                            <p class="text-sm text-gray-600 mt-1">Perbandingan selesai vs proses per hari.</p>
+                        </div>
+                        <div class="hidden sm:flex items-center gap-3">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded" style="background: var(--accent);"></span>
+                                <span class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Selesai</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded" style="background: var(--amber);"></span>
+                                <span class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Proses</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 space-y-3">
+                        @foreach($weeklyData as $day)
+                            @php
+                                $complete = $day['complete'] ?? 0;
+                                $progress = $day['on_progress'] ?? 0;
+                                $total = $complete + $progress;
+                                $cW = $weeklyMax > 0 ? (($complete / $weeklyMax) * 100) : 0;
+                                $pW = $weeklyMax > 0 ? (($progress / $weeklyMax) * 100) : 0;
+                            @endphp
+                            <div class="flex items-center gap-4">
+                                <div class="w-14">
+                                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">{{ substr($day['day_name'], 0, 3) }}</p>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="h-3 rounded-full overflow-hidden" style="background: rgba(0,0,0,0.06);">
+                                        <div class="h-full" style="width: {{ $cW }}%; background: var(--accent); float:left;"></div>
+                                        <div class="h-full" style="width: {{ $pW }}%; background: var(--amber); float:left;"></div>
+                                    </div>
+                                </div>
+                                <div class="w-20 text-right">
+                                    <p class="font-display text-sm font-extrabold text-gray-900">{{ $total }}</p>
+                                    <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">Total</p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5">
+                <div class="card p-6 md:p-8 shadow-sm h-full">
+                    <p class="text-[10px] font-black uppercase tracking-[0.22em] text-gray-400">Kategori</p>
+                    <h3 class="font-display text-lg font-extrabold tracking-tight text-gray-900 mt-2">Paling Sering Dilaporkan</h3>
+                    <p class="text-sm text-gray-600 mt-1">Distribusi aspirasi berdasarkan kategori.</p>
+
+                    <div class="mt-6 space-y-3">
+                        @forelse($topCategories as $count)
+                            @php
+                                $pct = $totalFeedback > 0 ? round(($count->total / $totalFeedback) * 100) : 0;
+                            @endphp
+                            <div class="rounded-2xl p-4" style="background: rgba(12,34,64,0.03); border: 1px solid rgba(12,34,64,0.06);">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-extrabold text-gray-900 truncate">{{ $count->kategori->name ?? 'Lainnya' }}</p>
+                                        <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 mt-1">{{ $count->total }} laporan</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-display text-lg font-extrabold text-gray-900">{{ $pct }}%</p>
+                                    </div>
+                                </div>
+                                <div class="mt-3 h-2 rounded-full overflow-hidden" style="background: rgba(0,0,0,0.06);">
+                                    <div class="h-full rounded-full" style="width: {{ $pct }}%; background: var(--navy);"></div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="rounded-2xl p-10 text-center text-gray-600" style="background: rgba(12,34,64,0.03); border: 1px solid rgba(12,34,64,0.06);">
+                                Belum ada data kategori.
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Queue -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="card overflow-hidden shadow-sm">
+                <div class="px-6 py-5 border-b border-black/[0.04] flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <div class="w-3 h-3 rounded-full bg-blue-600"></div>
-                        <span class="text-[10px] font-bold text-gray-500 uppercase">Selesai</span>
+                        <span class="w-2 h-2 rounded-full" style="background: var(--amber);"></span>
+                        <p class="text-[11px] font-black uppercase tracking-[0.22em] text-gray-400">Perlu Tindakan</p>
                     </div>
+                    <a href="{{ route('admin.feedback') }}" class="text-[11px] font-black uppercase tracking-[0.18em]" style="color: var(--accent);">Lihat semua</a>
+                </div>
+                <div class="divide-y divide-black/[0.04]">
+                    @forelse($inProgressAspirations as $aspirasi)
+                        <a href="{{ route('admin.feedback.show', $aspirasi->id) }}" class="block px-6 py-5 hover:bg-black/[0.02] transition">
+                            <p class="text-sm font-extrabold text-gray-900">{{ $aspirasi->feedback_title }}</p>
+                            <p class="text-sm text-gray-600 mt-1 line-clamp-2">{{ $aspirasi->details }}</p>
+                            <div class="mt-3 flex items-center justify-between">
+                                <span class="inline-flex px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-[0.18em]" style="background: rgba(229,164,17,0.15); color: var(--navy); border: 1px solid rgba(229,164,17,0.25);">On progress</span>
+                                <span class="text-[11px] font-bold text-gray-400">{{ optional($aspirasi->created_at)->format('d M Y') }}</span>
+                            </div>
+                        </a>
+                    @empty
+                        <div class="px-6 py-12 text-center">
+                            <p class="text-gray-600 font-bold">Semua tertangani!</p>
+                            <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 mt-1">Tidak ada item perlu tindakan</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="card overflow-hidden shadow-sm">
+                <div class="px-6 py-5 border-b border-black/[0.04] flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <div class="w-3 h-3 rounded-full bg-amber-400"></div>
-                        <span class="text-[10px] font-bold text-gray-500 uppercase">Proses</span>
+                        <span class="w-2 h-2 rounded-full" style="background: var(--accent);"></span>
+                        <p class="text-[11px] font-black uppercase tracking-[0.22em] text-gray-400">Selesai</p>
                     </div>
+                    <a href="{{ route('admin.feedback') }}" class="text-[11px] font-black uppercase tracking-[0.18em]" style="color: var(--accent);">Lihat semua</a>
                 </div>
-            </div>
-
-            <!-- Bar Chart -->
-            <div class="flex items-end justify-between h-64 gap-2 sm:gap-4 px-2">
-                @php
-                    $maxVal = max(5, ...array_values(array_map(fn($d) => $d['complete'] + $d['on_progress'], $weeklyData)));
-                @endphp
-                @foreach($weeklyData as $day)
-                <div class="flex flex-col items-center gap-3 flex-1 group">
-                    <div class="w-full flex gap-1 items-end justify-center h-48 relative">
-                        @php
-                            $compPerc = ($day['complete'] / $maxVal) * 100;
-                            $progPerc = ($day['on_progress'] / $maxVal) * 100;
-                        @endphp
-                        <div class="bg-blue-600 w-full max-w-[12px] rounded-t-lg transition-all group-hover:bg-blue-700 relative" style="height: {{ max(1, $compPerc) }}%;" title="{{ $day['complete'] }} Selesai">
-                             @if($day['complete'] > 0)
-                                <span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-black text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">{{ $day['complete'] }}</span>
-                             @endif
+                <div class="divide-y divide-black/[0.04]">
+                    @forelse($completedAspirations as $aspirasi)
+                        <a href="{{ route('admin.feedback.show', $aspirasi->id) }}" class="block px-6 py-5 hover:bg-black/[0.02] transition">
+                            <p class="text-sm font-extrabold text-gray-900">{{ $aspirasi->feedback_title }}</p>
+                            <p class="text-sm text-gray-600 mt-1 line-clamp-2">{{ $aspirasi->details }}</p>
+                            <div class="mt-3 flex items-center justify-between">
+                                <span class="inline-flex px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-[0.18em]" style="background: rgba(29,109,181,0.12); color: var(--accent); border: 1px solid rgba(29,109,181,0.22);">Complete</span>
+                                <span class="text-[11px] font-bold text-gray-400">{{ optional($aspirasi->created_at)->format('d M Y') }}</span>
+                            </div>
+                        </a>
+                    @empty
+                        <div class="px-6 py-12 text-center">
+                            <p class="text-gray-600 font-bold">Belum ada aspirasi selesai.</p>
+                            <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 mt-1">Mulai dari antrian proses</p>
                         </div>
-                        <div class="bg-amber-400 w-full max-w-[12px] rounded-t-lg transition-all group-hover:bg-amber-500 relative" style="height: {{ max(1, $progPerc) }}%;" title="{{ $day['on_progress'] }} Proses">
-                             @if($day['on_progress'] > 0)
-                                <span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-black text-amber-600 opacity-0 group-hover:opacity-100 transition-opacity">{{ $day['on_progress'] }}</span>
-                             @endif
-                        </div>
-                    </div>
-                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter truncate w-full text-center">{{ substr($day['day_name'], 0, 3) }}</span>
-                </div>
-                @endforeach
-            </div>
-        </div>
-
-        <!-- Response Rates -->
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
-            <h3 class="text-lg font-black text-gray-900 uppercase tracking-tighter mb-8">Efektivitas Pelayanan</h3>
-            <div class="space-y-8">
-                <div>
-                    <div class="flex justify-between items-end mb-3">
-                        <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Tingkat Respon Admin</span>
-                        <p class="text-2xl font-black text-gray-900">{{ $responseRate }}%</p>
-                    </div>
-                    <div class="w-full bg-gray-50 rounded-full h-3 overflow-hidden">
-                        <div class="bg-emerald-500 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(16,185,129,0.3)]" style="width: {{ $responseRate }}%"></div>
-                    </div>
-                </div>
-                <div>
-                    <div class="flex justify-between items-end mb-3">
-                        <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Feedback Dalam Peninjauan</span>
-                        <p class="text-2xl font-black text-gray-900">{{ $reviewedRate }}%</p>
-                    </div>
-                    <div class="w-full bg-gray-50 rounded-full h-3 overflow-hidden">
-                        <div class="bg-blue-500 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(59,130,246,0.3)]" style="width: {{ $reviewedRate }}%"></div>
-                    </div>
-                </div>
-                <div>
-                    <div class="flex justify-between items-end mb-3">
-                        <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Penyelesaian Keluhan</span>
-                        <p class="text-2xl font-black text-gray-900">{{ $completedRate }}%</p>
-                    </div>
-                    <div class="w-full bg-gray-50 rounded-full h-3 overflow-hidden">
-                        <div class="bg-amber-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(251,191,36,0.3)]" style="width: {{ $completedRate }}%"></div>
-                    </div>
+                    @endforelse
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Category & Activity -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-         <!-- Aspirasi by Category -->
-         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 overflow-hidden h-fit">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-black text-gray-900 uppercase tracking-tighter">Kategori Populer</h3>
-                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-            </div>
-            <div class="space-y-3 max-h-[280px] overflow-y-auto pr-2 custom-scrollbar">
-                @forelse($countsByCategory as $count)
-                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-all group">
-                    <span class="text-sm font-bold text-gray-600 group-hover:text-blue-600">{{ $count->kategori->name ?? 'Lainnya' }}</span>
-                    <span class="px-3 py-1 bg-white rounded-xl text-xs font-black text-gray-900 shadow-sm border border-gray-100">{{ $count->total }}</span>
-                </div>
-                @empty
-                <div class="text-center py-12 text-gray-400 italic text-sm">Belum ada data kategori.</div>
-                @endforelse
-            </div>
-        </div>
-
-        <!-- User Activity -->
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 h-fit">
-             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-black text-gray-900 uppercase tracking-tighter">Aktivitas User</h3>
-                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-            </div>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center p-5 bg-gradient-to-r from-blue-50 to-transparent border-l-4 border-blue-500 rounded-r-2xl">
-                    <div>
-                        <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Hari Ini</span>
-                        <p class="text-sm font-bold text-gray-500">User Aktif</p>
-                    </div>
-                    <span class="text-2xl font-black text-gray-900">{{ $activeToday }}</span>
-                </div>
-                <div class="flex justify-between items-center p-5 bg-gradient-to-r from-indigo-50 to-transparent border-l-4 border-indigo-500 rounded-r-2xl">
-                    <div>
-                        <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Minggu Ini</span>
-                        <p class="text-sm font-bold text-gray-500">User Berpartisipasi</p>
-                    </div>
-                    <span class="text-2xl font-black text-gray-900">{{ $activeThisWeek }}</span>
-                </div>
-                <div class="flex justify-between items-center p-5 bg-gradient-to-r from-purple-50 to-transparent border-l-4 border-purple-500 rounded-r-2xl">
-                    <div>
-                        <span class="text-[10px] font-black text-purple-600 uppercase tracking-widest">Bulan Ini</span>
-                        <p class="text-sm font-bold text-gray-500">Reach Dashboard</p>
-                    </div>
-                    <span class="text-2xl font-black text-gray-900">{{ $activeThisMonth }}</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recent Actions Quick Link -->
-        <div class="bg-gradient-to-br from-indigo-600 via-blue-700 to-blue-800 rounded-3xl shadow-lg p-8 text-white flex flex-col justify-between relative overflow-hidden group">
-            <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white opacity-5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
-            <div class="relative z-10">
-                <div class="w-12 h-12 rounded-2xl bg-white bg-opacity-20 flex items-center justify-center mb-6">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </div>
-                <h3 class="text-xl font-black uppercase tracking-tighter mb-2">Butuh Bantuan?</h3>
-                <p class="text-blue-100 text-sm font-medium leading-relaxed">Cari aspirasi spesifik atau filter berdasarkan status untuk pengelolaan yang lebih efisien.</p>
-            </div>
-            <a href="{{ route('admin.feedback') }}" class="relative z-10 mt-8 flex items-center justify-center gap-2 py-4 bg-white text-blue-700 rounded-2xl font-black transition-all hover:bg-blue-50 active:scale-95 shadow-xl">
-                CARI FEEDBACK
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </a>
-        </div>
-    </div>
-
-    <!-- Recent Lists -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Selesai List -->
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
-                <div class="flex items-center gap-3">
-                    <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                    <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Aspirasi Selesai</h3>
-                </div>
-                <span class="text-[10px] font-bold text-gray-400">3 TERBARU</span>
-            </div>
-            <div class="divide-y divide-gray-50">
-                @forelse($completedAspirations as $aspirasi)
-                <div class="p-6 hover:bg-blue-50/30 transition-colors group cursor-pointer" onclick="window.location='{{ route('admin.feedback.show', $aspirasi->id) }}'">
-                    <div class="flex items-center gap-4">
-                        <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform shadow-sm">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        </div>
-                        <div class="min-w-0 flex-1">
-                            <p class="font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate text-base">{{ $aspirasi->feedback_title }}</p>
-                            <p class="text-xs text-gray-400 line-clamp-1 mt-1 font-medium">{{ $aspirasi->details }}</p>
-                        </div>
-                        <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path></svg>
-                    </div>
-                </div>
-                @empty
-                <div class="p-16 text-center text-gray-400 font-medium italic text-sm">Belum ada aspirasi selesai.</div>
-                @endforelse
-            </div>
-        </div>
-
-        <!-- Proses List -->
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
-                <div class="flex items-center gap-3">
-                    <div class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
-                    <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Perlu Tindakan</h3>
-                </div>
-                <span class="text-[10px] font-bold text-gray-400">PENTING</span>
-            </div>
-            <div class="divide-y divide-gray-50">
-                @forelse($inProgressAspirations as $aspirasi)
-                <div class="p-6 hover:bg-blue-50/30 transition-colors group cursor-pointer" onclick="window.location='{{ route('admin.feedback.show', $aspirasi->id) }}'">
-                    <div class="flex items-center gap-4">
-                        <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform shadow-sm">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </div>
-                        <div class="min-w-0 flex-1">
-                            <p class="font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate text-base">{{ $aspirasi->feedback_title }}</p>
-                            <p class="text-xs text-gray-400 line-clamp-1 mt-1 font-medium">{{ $aspirasi->details }}</p>
-                        </div>
-                        <svg class="w-5 h-5 text-gray-300 group-hover:text-amber-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </div>
-                </div>
-                @empty
-                <div class="p-16 text-center text-gray-400 font-medium italic text-sm">
-                    <p class="mb-2">Semua tertangani! 🎉</p>
-                    <p class="text-[10px] text-gray-300 not-italic uppercase tracking-widest font-black">Good Job, Admin!</p>
-                </div>
-                @endforelse
-            </div>
-        </div>
+        </section>
     </div>
 </div>
 
-<style>
-.custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #e5e7eb;
-    border-radius: 10px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #d1d5db;
-}
-</style>
 @endsection

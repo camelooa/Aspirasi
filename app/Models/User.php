@@ -16,14 +16,8 @@ class User extends Authenticatable
         'username',
         'full_name',
         'email',
-        'otp_code',
-        'otp_expires_at',
         'roles',
         'password',
-    ];
-    
-    protected $casts = [
-        'otp_expires_at' => 'datetime',
     ];
 
     protected $hidden = [

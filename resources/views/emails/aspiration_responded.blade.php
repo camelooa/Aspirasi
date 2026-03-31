@@ -4,104 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tanggapan Aspirasi</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        .container {
-            background-color: #ffffff;
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .header {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px 8px 0 0;
-            margin: -30px -30px 20px -30px;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-        .info-section {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-left: 4px solid #48bb78;
-            border-radius: 4px;
-        }
-        .info-label {
-            font-weight: bold;
-            color: #38a169;
-            margin-bottom: 5px;
-        }
-        .info-value {
-            color: #333;
-            margin-bottom: 15px;
-        }
-        .details-box {
-            background-color: #f0fff4;
-            border: 1px solid #c6f6d5;
-            border-radius: 4px;
-            padding: 15px;
-            margin: 15px 0;
-        }
-        .footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
-            text-align: center;
-            color: #666;
-            font-size: 14px;
-        }
-        .badge {
-            display: inline-block;
-            padding: 5px 10px;
-            background-color: #48bb78;
-            color: white;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-    </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>✅ Aspirasi Telah Ditanggapi</h1>
-        </div>
-
-        <p>Halo {{ $student->full_name }},</p>
-        <p>Aspirasi Anda mengenai <strong>{{ $aspirasi->feedback_title }}</strong> telah ditanggapi oleh Admin.</p>
-
-        <div class="info-section">
-            <div class="info-label">📌 Judul Aspirasi:</div>
-            <div class="info-value">{{ $aspirasi->feedback_title }}</div>
-
-            <div class="info-label">📂 Kategori:</div>
-            <div class="info-value"><span class="badge">{{ $aspirasi->kategori->name }}</span></div>
-            
-            <div class="info-label">📅 Tanggal Ditanggapi:</div>
-            <div class="info-value">{{ now()->format('d F Y, H:i') }} WIB</div>
-        </div>
-
-        <div class="info-label">💬 Tanggapan Admin:</div>
-        <div class="details-box">
-            {{ $aspirasi->admin_response }}
-        </div>
-
-        <div class="footer">
-            <p>Email ini dikirim secara otomatis dari Sistem Aspirasi KKA.</p>
-            <p>Terima kasih atas partisipasi Anda.</p>
-        </div>
+<body style="margin:0; padding:0; background:#F4F1EB;">
+    <div style="display:none; max-height:0; overflow:hidden; opacity:0;">
+        Aspirasi Anda telah ditanggapi oleh Admin.
     </div>
+
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#F4F1EB; padding: 24px 12px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width:600px; max-width:600px;">
+                    <tr>
+                        <td style="background:#0C2240; padding:18px 22px; border-radius:16px 16px 0 0;">
+                            <p style="margin:0; font-family: Arial, Helvetica, sans-serif; font-size:12px; letter-spacing:2.2px; text-transform:uppercase; color: rgba(255,255,255,0.75); font-weight:700;">Merdeka Aspirasi</p>
+                            <p style="margin:6px 0 0; font-family: Arial, Helvetica, sans-serif; font-size:20px; color:#FFFFFF; font-weight:900;">Aspirasi Telah Ditanggapi</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="background:#FFFFFF; border:1px solid #E2DDD5; border-top:0; padding:22px; border-radius:0 0 16px 16px;">
+                            <p style="margin:0 0 10px; font-family: Arial, Helvetica, sans-serif; font-size:14px; color:#0F172A;">Halo <strong>{{ $student->full_name }}</strong>,</p>
+                            <p style="margin:0 0 16px; font-family: Arial, Helvetica, sans-serif; font-size:14px; color:#334155;">Aspirasi Anda mengenai <strong>{{ $aspirasi->feedback_title }}</strong> telah ditanggapi oleh Admin.</p>
+
+                            <div style="border:1px solid #E2DDD5; border-left:4px solid #E5A411; border-radius:14px; padding:16px; background:#FFFFFF;">
+                                <p style="margin:0 0 10px; font-family: Arial, Helvetica, sans-serif; font-size:11px; letter-spacing:2.2px; text-transform:uppercase; color:#64748B; font-weight:900;">Ringkasan</p>
+
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">
+                                    <tr>
+                                        <td style="padding:6px 0; font-family: Arial, Helvetica, sans-serif; font-size:12px; color:#64748B; font-weight:800; text-transform:uppercase; letter-spacing:1.6px;">Judul</td>
+                                        <td style="padding:6px 0; font-family: Arial, Helvetica, sans-serif; font-size:13px; color:#0F172A; font-weight:700;" align="right">{{ $aspirasi->feedback_title }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:6px 0; font-family: Arial, Helvetica, sans-serif; font-size:12px; color:#64748B; font-weight:800; text-transform:uppercase; letter-spacing:1.6px;">Kategori</td>
+                                        <td style="padding:6px 0;" align="right">
+                                            <span style="display:inline-block; padding:6px 10px; border-radius:999px; background:#0C2240; color:#FFFFFF; font-family: Arial, Helvetica, sans-serif; font-size:12px; font-weight:800;">{{ $aspirasi->kategori->name }}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:6px 0; font-family: Arial, Helvetica, sans-serif; font-size:12px; color:#64748B; font-weight:800; text-transform:uppercase; letter-spacing:1.6px;">Ditanggapi</td>
+                                        <td style="padding:6px 0; font-family: Arial, Helvetica, sans-serif; font-size:13px; color:#0F172A; font-weight:700;" align="right">{{ now()->format('d F Y, H:i') }} WIB</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div style="margin-top:16px;">
+                                <p style="margin:0 0 8px; font-family: Arial, Helvetica, sans-serif; font-size:11px; letter-spacing:2.2px; text-transform:uppercase; color:#64748B; font-weight:900;">Tanggapan Admin</p>
+                                <div style="border:1px solid #E2DDD5; border-radius:14px; padding:14px; background:#F7F3EB;">
+                                    <p style="margin:0; font-family: Arial, Helvetica, sans-serif; font-size:14px; color:#334155; line-height:1.6; white-space:pre-line;">{{ $aspirasi->admin_response }}</p>
+                                </div>
+                            </div>
+
+                            <div style="margin-top:18px; padding-top:14px; border-top:1px solid #E2DDD5;">
+                                <p style="margin:0; text-align:center; font-family: Arial, Helvetica, sans-serif; font-size:12px; color:#94A3B8;">Email ini dikirim otomatis dari sistem. Terima kasih atas partisipasi Anda.</p>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding:12px 4px;">
+                            <p style="margin:0; text-align:center; font-family: Arial, Helvetica, sans-serif; font-size:12px; color:#94A3B8;">&copy; {{ date('Y') }} Merdeka Aspirasi</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>

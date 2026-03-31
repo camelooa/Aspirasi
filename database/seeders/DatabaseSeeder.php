@@ -11,7 +11,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Demo Users (email-based login + OTP)
+        // Demo Users (email-based login)
         User::updateOrCreate(
             ['username' => 'superadmin'],
             [

@@ -5,10 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\OtpMail;
-use App\Models\User;
-use Carbon\Carbon;
 
 class LoginController extends Controller
 {
@@ -26,7 +22,7 @@ class LoginController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | Handle Login (Step 1: Validate Password + Send OTP)
+    | Handle Login
     |--------------------------------------------------------------------------
     */
     public function login(Request $request)
@@ -36,31 +32,23 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
-        // cek credentials TANPA login
-        if (!Auth::validate($request->only('email', 'password'))) {
+        $credentials = $request->only('email', 'password');
+
+        if (!Auth::attempt($credentials)) {
             return back()->withErrors([
-                'email' => 'Email atau password salah'
+                'email' => 'Email atau password salah',
             ])->withInput();
         }
 
-        // ambil user
-        $user = User::where('email', $request->email)->first();
+        $request->session()->regenerate();
 
-        // generate OTP
-        $otp = rand(100000, 999999);
+        $user = Auth::user();
 
-        $user->otp_code = $otp;
-        $user->otp_expires_at = Carbon::now()->addMinutes(5);
-        $user->save();
-
-        // kirim email
-        Mail::to($user->email)->send(new OtpMail($otp, $user->username));
-
-        // simpan sementara (BELUM LOGIN)
-        session(['otp_user_id' => $user->id]);
-
-        // redirect ke halaman otp
-        return redirect()->route('otp.form');
+        return match ($user->roles) {
+            'admin', 'super_admin' => redirect()->route('admin.dashboard'),
+            'siswa'               => redirect()->route('siswa.dashboard'),
+            default               => redirect()->route('home'),
+        };
     }
 
 
